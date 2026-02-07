@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SEC Filing Calendar</title>
+    <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 40px; background: #f4f7f6; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #007bff; color: white; }
+        tr:hover { background: #f1f1f1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 2026 Filing Calendar</h1>
+        <input type="text" id="search" placeholder="Type a ticker (e.g., TSLA)..." onkeyup="filterTable()">
+        <table id="target">
+            <thead><tr><th>Ticker</th><th>Deadline</th><th>Source</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        let masterData = [];
+        Papa.parse("calendar.csv", {
+            download: true, header: true,
+            complete: function(results) {
+                masterData = results.data;
+                showData(masterData);
+            }
+        });
+
+        function showData(data) {
+            const html = data.map(row => `<tr><td><b>${row.Ticker}</b></td><td>${row.Date}</td><td>${row.Source}</td></tr>`).join("");
+            document.querySelector("#target tbody").innerHTML = html;
+        }
+
+        function filterTable() {
+            const query = document.getElementById("search").value.toUpperCase();
+            const filtered = masterData.filter(row => row.Ticker && row.Ticker.includes(query));
+            showData(filtered);
+        }
+    </script>
+</body>
+</html>
