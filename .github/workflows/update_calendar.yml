@@ -1,0 +1,26 @@
+name: SEC Update Robot
+on:
+  schedule:
+    - cron: '0 0 * * *' # Midnight every night
+  workflow_dispatch:   # Lets you click a button to start it
+
+jobs:
+  run-harvester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install Tools
+        run: pip install requests pandas
+      - name: Run Script
+        run: python harvester.py
+      - name: Save Changes
+        run: |
+          git config --global user.name 'Robot'
+          git config --global user.email 'robot@github.com'
+          git add calendar.csv
+          git commit -m "Auto-update filings" || echo "No changes"
+          git push
